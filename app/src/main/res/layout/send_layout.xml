@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
-
+    android:orientation="vertical">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,22 +11,21 @@
         android:textSize="50dp"
         android:textAlignment="center"
         android:layout_marginBottom="50dp"
-        android:id="@+id/senderTitle"
-        android:gravity="center_horizontal" />
+        android:id="@+id/SenderTitle"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Script: "
+        android:text="Messaging... "
         android:textSize="25dp"
         android:layout_marginBottom="20dp"
-        android:id="@+id/scriptTitle"/>
+        android:id="@+id/messageText"/>
 
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:id="@+id/scriptText"/>
+        android:id="@+id/MessageRecycler"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -39,10 +34,7 @@
         android:layout_marginBottom="10dp"
         android:background="@color/teal_700"
         android:gravity="center"
-        android:text="Start"
+        android:text="Stop"
         android:textSize="25dp"
-        android:id="@+id/startButton"/>
-
-
-
+        android:id="@+id/stopButton"/>
 </LinearLayout>

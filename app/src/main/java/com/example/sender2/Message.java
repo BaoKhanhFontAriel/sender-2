@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Message {
 
     private static Message instance;
-    private ArrayList<String> messageList;
+    private ArrayList<MessageEntry> messageList = new ArrayList<>();
 
     public static Message getInstance() {
         if (instance == null){
@@ -14,11 +14,11 @@ public class Message {
         return instance;
     }
 
-    public void addMessage(String message){
+    public void addMessage(MessageEntry message){
         messageList.add(message);
     }
 
-    public ArrayList<String> getMessageList() {
+    public ArrayList<MessageEntry> getMessageList() {
         return messageList;
     }
 }

@@ -9,57 +9,52 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-    Handler handler = new Handler();
+    TextView scriptText;
+    String[] senderMessages;
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals("")){
-                String dta = intent.getStringExtra("mess");
-                list.ad
-            }
-        }
-    };
+
+    static String messages = "Hello;Banana;Apple;Kitten;Soda;Orange;Vegetable;Milk;Soda;Orange;Vegetable;Milk;";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button startButton = findViewById(R.id.startButton);
+        scriptText = findViewById(R.id.scriptText);
+        TextView scriptTitle = findViewById(R.id.scriptTitle);
+        TextView senderTitle = findViewById(R.id.senderTitle);
 
-        IntentFilter intentFilter = new IntentFilter(new Intent("jhgjhgjh"));
+        displaySenderMessages();
 
-
-        registerReceiver(broadcastReceiver, intentFilter);
-
-
-        Intent i = new Intent();
-        i.setAction("send message");
-        i.putExtra("mess", "ljhbjlh ");
-        sendBroadcast(i);
-
-        handler.post(runnable);
+        startButton.setOnClickListener(v ->{
+            Intent intent = new Intent(getApplicationContext(), SenderActivity.class);
+            startActivity(intent);
+        });
 
     }
+    public void displaySenderMessages(){
+        senderMessages = split(messages);
+        String printText = "";
+        for (String s: senderMessages){
+            printText += s + ";\n";
+        }
+        scriptText.setText(printText);
+    }
 
-
+    public String[] split (String messages){
+        return messages.split(";", 0);
+    }
 
     void onoiuoio(){
         Intent service = new Intent(this, ServiceClass.class);
         startService(service);
     }
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-
-            /////
-
-            handler.postDelayed(this, 3000);
-
-        }
-    };
-
-
 }
