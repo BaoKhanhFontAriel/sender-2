@@ -20,7 +20,8 @@ public class MainActivity extends AppCompatActivity {
     String[] senderMessages;
 
 
-    static String messages = "Hello;Banana;Apple;Kitten;Soda;Orange;Vegetable;Milk;Soda;Orange;Vegetable;Milk;";
+    static String messages = "Hello;Banana;Apple;Kitten;Soda;Orange;";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
