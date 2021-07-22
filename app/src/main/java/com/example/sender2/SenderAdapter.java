@@ -35,6 +35,7 @@ public class SenderAdapter extends RecyclerView.Adapter<SenderAdapter.SenderView
     @Override
     public void onBindViewHolder(SenderAdapter.SenderViewHolder holder, int position) {
         MessageEntry messageEntry = messagesList.get(position);
+
         if (!messageEntry.getSenderMessage().isEmpty() && messageEntry.getReceiverMessage().isEmpty() ) {
             holder.senderMessage.setText(messageEntry.getSenderMessage());
             holder.receiverMessage.setBackground(null);
@@ -43,9 +44,23 @@ public class SenderAdapter extends RecyclerView.Adapter<SenderAdapter.SenderView
             holder.senderMessage.setBackground(null);
             holder.receiverMessage.setText(messageEntry.getReceiverMessage());
         }
+        if (messageEntry.getSenderMessage().isEmpty() && messageEntry.getReceiverMessage().isEmpty()) {
+            holder.senderMessage.setVisibility(View.GONE);
+            holder.receiverMessage.setVisibility(View.GONE);
+        }
 
 
     }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
 
     @Override
     public int getItemCount() {

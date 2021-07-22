@@ -20,7 +20,20 @@ public class MainActivity extends AppCompatActivity {
     String[] senderMessages;
 
 
-    static String messages = "Hello;Banana;Apple;Kitten;Soda;Orange;";
+    static String messages = "Quo modi sit;" +
+            " reprehenderit;" +
+            " natus cumque a odio; " +
+            "Explicabo voluptatem;" +
+            " et in culpa;" +
+            " incidunt suscipit;" +
+            " odio neque; " +
+            "In aut repellendus;" +
+            " eveniet voluptas hic et;" +
+            " Deserunt libero ut sed; " +
+            "Aut ut ut corporis veritatis;" +
+            " voluptate pariatur et illo;" +
+            "Odit aut non quis;" +
+            " molestiae praesentium;";
 
 
     @Override
