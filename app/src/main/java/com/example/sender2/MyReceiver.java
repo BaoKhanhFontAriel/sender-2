@@ -10,11 +10,15 @@ public class MyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(SenderActivity.TAG, "intent: " + intent.getAction());
+
         if (!intent.getAction().equals("")) {
-            Intent i = new Intent(context, SenderActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.putExtra("receiver message", intent.getStringExtra("receiver message"));
-            context.startActivity(i);
+            Intent i = new Intent("update message");
+
+            String message = intent.getStringExtra("receiver message");
+            Message.getInstance().addMessage(new MessageEntry("", message));
+
+            context.sendBroadcast(i);
+
         }
     }
 }

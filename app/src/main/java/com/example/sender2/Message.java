@@ -21,4 +21,8 @@ public class Message {
     public ArrayList<MessageEntry> getMessageList() {
         return messageList;
     }
+
+    public MessageEntry getLastMessage(){
+        return messageList.get(messageList.size() - 1);
+    }
 }

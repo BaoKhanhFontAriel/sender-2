@@ -12,7 +12,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,10 +22,25 @@ public class SenderActivity extends AppCompatActivity {
     SenderAdapter senderAdapter;
     Intent senderIntent;
     String[] senderMessages;
-    BroadcastReceiver myReceiver;
+    boolean isMessageSendImmediately = false;
 
 
     Handler handler = new Handler(Looper.getMainLooper());
+
+    BroadcastReceiver myReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive: ");
+
+            senderAdapter.insertItem(Message.getInstance().getLastMessage());
+            scrollToCurrentPosition();
+
+            Log.d(TAG, "onReceive: immediateRunnable call: " + handler.post(immediateRunnable));
+
+            isMessageSendImmediately = true;
+
+        }
+    };
 
 
     @Override
@@ -34,12 +48,13 @@ public class SenderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.send_layout);
 
+
+        Log.d(TAG, "onCreate: ");
+
         Button stopButton = findViewById(R.id.stopButton);
         messageRecycler = findViewById(R.id.MessageRecycler);
         TextView messageText = findViewById(R.id.messageText);
         TextView senderTitle = findViewById(R.id.senderTitle);
-
-        myReceiver = new MyReceiver();
 
 
         senderIntent = new Intent("com.example.myMessage");
@@ -54,14 +69,10 @@ public class SenderActivity extends AppCompatActivity {
         messageRecycler.setLayoutManager(new LinearLayoutManager(this));
 
 
-        // Send the message
-
-
         senderMessages = MainActivity.messages.split(";", 0);
 
-        handler.postDelayed(runnable, 3000);
+        handler.postDelayed(delayedRunnable, 3000);
 
-        processIntent(getIntent());
 
         stopButton.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -69,33 +80,25 @@ public class SenderActivity extends AppCompatActivity {
             Message.getInstance().getMessageList().clear();
             senderAdapter.notifyDataSetChanged();
             count = 0;
-            handler.removeCallbacks(runnable);
+            handler.removeCallbacks(delayedRunnable);
         });
 
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
-
-    public void processIntent(Intent intent) {
-        String message = intent.getStringExtra("receiver message");
-        senderAdapter.insertItem(new MessageEntry("", message));
-
-        scrollToCurrentPosition();
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+        handler.removeCallbacks(delayedRunnable);
         unregisterReceiver(myReceiver);
     }
 
     private int count = 0;
 
     public void sendMessage() {
+
+        Log.d(TAG, "sendMessage: ");
         senderIntent.putExtra("sender message", senderMessages[count]);
 
         senderAdapter.insertItem(new MessageEntry(senderMessages[count], ""));
@@ -107,20 +110,41 @@ public class SenderActivity extends AppCompatActivity {
     }
 
     public void scrollToCurrentPosition() {
-        messageRecycler.scrollToPosition(Message.getInstance().getMessageList().size()- 1);
+        messageRecycler.scrollToPosition(Message.getInstance().getMessageList().size() - 1);
 
     }
 
-    Runnable runnable = new Runnable() {
+    Runnable immediateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (count < senderMessages.length) {
+                sendMessage();
+            } else {
+                handler.removeCallbacks(delayedRunnable);
+            }
+
+            Log.d(TAG, "run: immediate");
+            handler.post(this);
+        }
+    };
+
+    Runnable delayedRunnable = new Runnable() {
         @Override
         public void run() {
 
             if (count < senderMessages.length) {
                 sendMessage();
-            } else {handler.removeCallbacks(runnable);}
+            } else {
+                handler.removeCallbacks(delayedRunnable);
+            }
 
-            handler.postDelayed(this, 5000);
+            if (!isMessageSendImmediately) {
+                Log.d(TAG, "run: delayed");
+                handler.postDelayed(this, 5000);
+            } else {
+                handler.post(this);
+                isMessageSendImmediately = false;
+            }
         }
     };
-
 }
