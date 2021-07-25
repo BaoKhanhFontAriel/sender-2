@@ -27,18 +27,28 @@ public class SenderActivity extends AppCompatActivity {
 
     Handler handler = new Handler(Looper.getMainLooper());
 
-    BroadcastReceiver myReceiver = new BroadcastReceiver() {
+    BroadcastReceiver myReceiver = new MyReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive: ");
+            if (intent.getStringExtra("receiver message") != null) {
+                Log.d(TAG, "onReceive: " + intent.getStringExtra("receiver message"));
 
-            senderAdapter.insertItem(Message.getInstance().getLastMessage());
-            scrollToCurrentPosition();
+                checkAndRemoveWaitingResponse();
 
-            Log.d(TAG, "onReceive: immediateRunnable call: " + handler.post(immediateRunnable));
+                // remove the old runnable when new message received
+                // because a sender message has to send immediately
+                // which breaking the cycle of old runnable
+                // the new runnable begin after the sender message sent
+                handler.removeCallbacks(messageRunnable);
+                handler.removeCallbacks(WaitingResponseRunnable);
 
-            isMessageSendImmediately = true;
-
+                senderAdapter.insertItem(new MessageEntry("", intent.getStringExtra("receiver message"), false));
+                if (count < senderMessages.length) {
+                    sendMessage();
+                    handler.postDelayed(WaitingResponseRunnable, 1000);
+                    handler.postDelayed(messageRunnable, 5000);
+                }
+            }
         }
     };
 
@@ -49,8 +59,6 @@ public class SenderActivity extends AppCompatActivity {
         setContentView(R.layout.send_layout);
 
 
-        Log.d(TAG, "onCreate: ");
-
         Button stopButton = findViewById(R.id.stopButton);
         messageRecycler = findViewById(R.id.MessageRecycler);
         TextView messageText = findViewById(R.id.messageText);
@@ -60,8 +68,9 @@ public class SenderActivity extends AppCompatActivity {
         senderIntent = new Intent("com.example.myMessage");
         senderIntent.setComponent(new ComponentName("com.example.receiver2", "com.example.receiver2.MyReceiver"));
 
-        IntentFilter intentFilter = new IntentFilter("com.example.myMessage");
+        IntentFilter intentFilter = new IntentFilter("update message");
         registerReceiver(myReceiver, intentFilter);
+
 
         senderAdapter = new SenderAdapter(Message.getInstance().getMessageList());
 
@@ -71,16 +80,10 @@ public class SenderActivity extends AppCompatActivity {
 
         senderMessages = MainActivity.messages.split(";", 0);
 
-        handler.postDelayed(delayedRunnable, 3000);
-
+        handler.postDelayed(messageRunnable, 3000);
 
         stopButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            Message.getInstance().getMessageList().clear();
-            senderAdapter.notifyDataSetChanged();
-            count = 0;
-            handler.removeCallbacks(delayedRunnable);
+            this.finish();
         });
 
     }
@@ -89,19 +92,25 @@ public class SenderActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: ");
-        handler.removeCallbacks(delayedRunnable);
+
+        Message.getInstance().getMessageList().clear();
+        senderAdapter.notifyDataSetChanged();
+        count = 0;
+
+        handler.removeCallbacks(WaitingResponseRunnable);
+        handler.removeCallbacks(messageRunnable);
         unregisterReceiver(myReceiver);
+
+        Log.d(TAG, "onDestroy: ");
     }
+
 
     private int count = 0;
 
     public void sendMessage() {
-
-        Log.d(TAG, "sendMessage: ");
         senderIntent.putExtra("sender message", senderMessages[count]);
 
-        senderAdapter.insertItem(new MessageEntry(senderMessages[count], ""));
+        senderAdapter.insertItem(new MessageEntry(senderMessages[count], "", false));
 
         sendBroadcast(senderIntent);
 
@@ -114,36 +123,44 @@ public class SenderActivity extends AppCompatActivity {
 
     }
 
-    Runnable immediateRunnable = new Runnable() {
+    public void checkAndRemoveWaitingResponse() {
+
+        if (count > 0 && Message.getInstance().getLastMessage().getIsWaitingResponse()) {
+            Log.d(TAG, "checkAndRemoveWaitingResponse: " + Message.getInstance().getLastMessage().getIsWaitingResponse());
+
+            Message.getInstance().getMessageList().remove(Message.getInstance().getLastMessage());
+            senderAdapter.notifyItemRemoved(Message.getInstance().getMessageList().size());
+            scrollToCurrentPosition();
+        }
+
+    }
+
+    public void displayWaitingResponse() {
+        senderAdapter.insertItem(new MessageEntry("", "", true));
+        scrollToCurrentPosition();
+    }
+
+    Runnable WaitingResponseRunnable = new Runnable() {
         @Override
         public void run() {
-            if (count < senderMessages.length) {
-                sendMessage();
-            } else {
-                handler.removeCallbacks(delayedRunnable);
-            }
-
-            Log.d(TAG, "run: immediate");
-            handler.post(this);
+            Log.d(TAG, "run: displayWaitingResponse");
+            displayWaitingResponse();
         }
     };
 
-    Runnable delayedRunnable = new Runnable() {
+    Runnable messageRunnable = new Runnable() {
         @Override
         public void run() {
+            // after 5s, remove the waiting response message
+            checkAndRemoveWaitingResponse();
 
-            if (count < senderMessages.length) {
+            // if sender message list end, stop all runnable
+            if (count == senderMessages.length) {
+                finish();
+            } else if (count < senderMessages.length) {
                 sendMessage();
-            } else {
-                handler.removeCallbacks(delayedRunnable);
-            }
-
-            if (!isMessageSendImmediately) {
-                Log.d(TAG, "run: delayed");
+                handler.postDelayed(WaitingResponseRunnable, 1000);
                 handler.postDelayed(this, 5000);
-            } else {
-                handler.post(this);
-                isMessageSendImmediately = false;
             }
         }
     };

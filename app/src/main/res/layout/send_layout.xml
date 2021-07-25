@@ -1,41 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="bottom"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
     <TextView
+        android:id="@+id/SenderTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text = "SENDER"
-        android:textSize="50dp"
+        android:layout_alignParentTop="true"
         android:textAlignment="center"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="50dp"
-        android:id="@+id/SenderTitle"/>
+        android:text="SENDER"
+        android:textSize="50dp"
+        android:gravity="center_horizontal" />
+
     <TextView
+        android:id="@+id/messageText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Messaging... "
-        android:textSize="25dp"
+        android:layout_below="@+id/SenderTitle"
         android:layout_marginBottom="20dp"
-        android:id="@+id/messageText"/>
+        android:text="Messaging... "
+        android:textSize="25dp" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/MessageRecycler"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/stopButton"
+        android:layout_below="@+id/messageText"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:id="@+id/MessageRecycler"/>
+        android:layout_marginRight="10dp" />
 
     <Button
+        android:id="@+id/stopButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
         android:background="@color/teal_700"
-        android:gravity="center"
         android:text="Stop"
-        android:textSize="25dp"
-        android:id="@+id/stopButton"/>
-</LinearLayout>
+        android:textSize="25dp" />
+</RelativeLayout>

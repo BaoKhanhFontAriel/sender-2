@@ -20,17 +20,17 @@ public class MainActivity extends AppCompatActivity {
     String[] senderMessages;
 
 
-    static String messages = "Hello, it's me;" +
-            "I was wondering if after all these years you'd like to meet;" +
-            "To go over everything;" +
-            "They say that time's supposed to heal ya;" +
-            "But I ain't done much healing;" +
-            "Hello, can you hear me?;" +
-            "I'm in California dreaming about who we used to be;" +
-            "When we were younger and free;" +
-            "I've forgotten how it felt before the world fell at our feet;" +
-            "There's such a difference between us;" +
-            "And a million miles;";
+    static String messages = "1. Hello, it's me;" +
+            "2. I was wondering if after all these years you'd like to meet;" +
+            "3. To go over everything;" +
+            "4. They say that time's supposed to heal ya;" +
+            "5. But I ain't done much healing;" +
+            "6. Hello, can you hear me?;" +
+            "7. I'm in California dreaming about who we used to be;" +
+            "8. When we were younger and free;" +
+            "9. I've forgotten how it felt before the world fell at our feet;" +
+            "10. There's such a difference between us;" +
+            "11. And a million miles;";
 
 
     @Override
@@ -45,7 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
         displaySenderMessages();
 
+
         startButton.setOnClickListener(v ->{
+
+            messages = scriptText.getText().toString().replace("\n", "");
             Intent intent = new Intent(getApplicationContext(), SenderActivity.class);
             startActivity(intent);
         });

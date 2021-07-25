@@ -15,7 +15,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.example.myMessage" />
+                <action android:name="update message" />
             </intent-filter>
         </receiver>
 
@@ -26,7 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SenderActivity" />
+        <activity android:name=".SenderActivity"/>
+
     </application>
 
 </manifest>

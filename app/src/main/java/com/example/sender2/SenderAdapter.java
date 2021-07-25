@@ -1,6 +1,7 @@
 package com.example.sender2;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +16,9 @@ import java.util.ArrayList;
 public class SenderAdapter extends RecyclerView.Adapter<SenderAdapter.SenderViewHolder> {
 
     ArrayList<MessageEntry> messagesList;
+    Boolean isWaitingResponse;
 
-    public SenderAdapter(ArrayList<MessageEntry> messagesList){
+    public SenderAdapter(ArrayList<MessageEntry> messagesList) {
         this.messagesList = messagesList;
     }
 
@@ -36,21 +38,28 @@ public class SenderAdapter extends RecyclerView.Adapter<SenderAdapter.SenderView
     public void onBindViewHolder(SenderAdapter.SenderViewHolder holder, int position) {
         MessageEntry messageEntry = messagesList.get(position);
 
-        if (!messageEntry.getSenderMessage().isEmpty() && messageEntry.getReceiverMessage().isEmpty() ) {
-            holder.senderMessage.setText(messageEntry.getSenderMessage());
-            holder.receiverMessage.setBackground(null);
+//        Log.d(SenderActivity.TAG, "onBindViewHolder: sender " + messageEntry.getSenderMessage());
+//        Log.d(SenderActivity.TAG, "onBindViewHolder: receiver " + messageEntry.getReceiverMessage());
+
+        if (!messageEntry.getIsWaitingResponse()) {
+            if (!messageEntry.getSenderMessage().isEmpty() && messageEntry.getReceiverMessage().isEmpty()) {
+                holder.senderMessage.setText(messageEntry.getSenderMessage());
+                holder.receiverMessage.setVisibility(View.GONE);
+                holder.waitingResponseText.setVisibility(View.GONE);
+            } else if (messageEntry.getSenderMessage().isEmpty() && !messageEntry.getReceiverMessage().isEmpty()) {
+                holder.senderMessage.setVisibility(View.GONE);
+                holder.receiverMessage.setText(messageEntry.getReceiverMessage());
+                holder.waitingResponseText.setVisibility(View.GONE);
+            }
         }
-        if (messageEntry.getSenderMessage().isEmpty() && !messageEntry.getReceiverMessage().isEmpty() ) {
-            holder.senderMessage.setBackground(null);
-            holder.receiverMessage.setText(messageEntry.getReceiverMessage());
-        }
-        if (messageEntry.getSenderMessage().isEmpty() && messageEntry.getReceiverMessage().isEmpty()) {
+        else {
             holder.senderMessage.setVisibility(View.GONE);
             holder.receiverMessage.setVisibility(View.GONE);
+            holder.waitingResponseText.setVisibility(View.VISIBLE);
         }
-
-
     }
+
+
     @Override
     public long getItemId(int position) {
         return position;
@@ -70,17 +79,20 @@ public class SenderAdapter extends RecyclerView.Adapter<SenderAdapter.SenderView
     public class SenderViewHolder extends RecyclerView.ViewHolder {
         TextView senderMessage;
         TextView receiverMessage;
+        TextView waitingResponseText;
 
         public SenderViewHolder(View itemView) {
             super(itemView);
 
             senderMessage = itemView.findViewById(R.id.send_message);
             receiverMessage = itemView.findViewById(R.id.receive_message);
+            waitingResponseText = itemView.findViewById(R.id.waiting_response_text);
         }
     }
 
-    public void insertItem(MessageEntry message){
+    public void insertItem(MessageEntry message) {
         this.messagesList.add(message);
         notifyItemInserted(messagesList.size());
     }
+
 }
